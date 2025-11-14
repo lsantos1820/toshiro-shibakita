@@ -1,48 +1,29 @@
-<html>
-
-<head>
-<title>Exemplo PHP</title>
-</head>
-<body>
-
 <?php
 ini_set("display_errors", 1);
-header('Content-Type: text/html; charset=iso-8859-1');
+header('Content-Type: text/html; charset=UTF-8');
 
+// Exibe versão do PHP
+echo 'Versão atual do PHP: ' . phpversion() . '<br><br>';
 
-
-echo 'Versao Atual do PHP: ' . phpversion() . '<br>';
-
-$servername = "54.234.153.24";
-$username = "root";
-$password = "Senha123";
-$database = "meubanco";
+// Credenciais lidas via variáveis de ambiente (mais seguro)
+$servername = getenv('DB_HOST');
+$username  = getenv('DB_USER');
+$password  = getenv('DB_PASS');
+$database  = getenv('DB_NAME');
 
 // Criar conexão
-
-
 $link = new mysqli($servername, $username, $password, $database);
 
-/* check connection */
-if (mysqli_connect_errno()) {
-    printf("Connect failed: %s\n", mysqli_connect_error());
-    exit();
+// Verificar conexão
+if ($link->connect_error) {
+    die("Erro de conexão: " . $link->connect_error);
 }
 
-$valor_rand1 =  rand(1, 999);
+// Valores de teste
+$valor_rand1 = rand(1, 999);
 $valor_rand2 = strtoupper(substr(bin2hex(random_bytes(4)), 1));
 $host_name = gethostname();
 
-
-$query = "INSERT INTO dados (AlunoID, Nome, Sobrenome, Endereco, Cidade, Host) VALUES ('$valor_rand1' , '$valor_rand2', '$valor_rand2', '$valor_rand2', '$valor_rand2','$host_name')";
-
-
-if ($link->query($query) === TRUE) {
-  echo "New record created successfully";
-} else {
-  echo "Error: " . $link->error;
-}
-
-?>
-</body>
-</html>
+// Query preparada (melhor prática simples)
+$stmt = $link->prepare("INSERT INTO dados (Nome, Sobrenome, Endereco, Cidade, Host) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $valor_rand2, $valor_rand2, $valo_
